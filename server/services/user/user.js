@@ -9,25 +9,23 @@ module.exports = {
   // ==============================
   allOrder: async (req, res) => {
     try {
-      var obj = await db.order.find({}).populate({
-        path: "userId",
-        select: ["name"],
-      });
+      var obj = await db.order.distinct("userId", {});
+      console.log(obj);
       var result = [];
-      if (obj != "") {
-        for (data of obj) {
+      if (obj.length > 0) {
+        for (var i = 0; i < obj.length; i++) {
           let noOfOrders = await db.order.countDocuments({
-            userId: data.userId._id,
+            userId: obj[i],
           });
-          let averageBill = await db.order.find({ userId: data.userId._id });
+          let averageBill = await db.order.find({ userId: obj[i] });
           var averageBillValue = 0;
           for (sum of averageBill) {
             averageBillValue = sum.subTotal + averageBillValue;
           }
+          let userName = await db.user.findOne({ _id: obj[i] });
           result.push({
-            id: data.userId._id,
-            name: data.userId.name,
-            subTotal: data.subTotal,
+            id: obj[i],
+            name: userName.name,
             noOfOrders: noOfOrders,
             averageBillValue: Math.round(averageBillValue / noOfOrders),
           });
