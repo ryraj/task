@@ -10,7 +10,6 @@ module.exports = {
   allOrder: async (req, res) => {
     try {
       var obj = await db.order.distinct("userId", {});
-      console.log(obj);
       var result = [];
       if (obj.length > 0) {
         for (var i = 0; i < obj.length; i++) {
